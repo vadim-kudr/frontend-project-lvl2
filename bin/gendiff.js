@@ -12,7 +12,9 @@ function parseCommandLine() {
 
   program
     .description('Compares two configuration files and shows a difference.')
-    .helpOption('-h, --help', 'output usage information');
+    .arguments('<filepath1> <filepath2>')
+    .helpOption('-h, --help', 'output usage information')
+    .option('-f, --format [type]', 'output format');
 
   program.parse();
 }
