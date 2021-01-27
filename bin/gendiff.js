@@ -1,19 +1,9 @@
 #!/usr/bin/env node
 
-import fs from 'fs';
-import path from 'path';
-
+import commander from 'commander';
 import genDiff from '../index.js';
 
-import commander from 'commander';
 const { Command } = commander;
-
-function readJsonFile(filepath) {
-  const resolvedPath = path.resolve(filepath);
-  const fileContent = fs.readFileSync(resolvedPath);
-
-  return JSON.parse(fileContent);
-}
 
 function parseCommandLine() {
   const program = new Command();
@@ -26,10 +16,7 @@ function parseCommandLine() {
     .helpOption('-h, --help', 'output usage information')
     .option('-f, --format [type]', 'output format')
     .action((filepath1, filepath2) => {
-      const json1 = readJsonFile(filepath1);
-      const json2 = readJsonFile(filepath2);
-
-      const diff = genDiff(json1, json2);
+      const diff = genDiff(filepath1, filepath2);
 
       console.log(diff);
     });
