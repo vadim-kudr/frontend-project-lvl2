@@ -1,0 +1,84 @@
+[
+  {
+    "key": "common",
+    "nested": true,
+    "value": [
+      {
+        "key": "setting1",
+        "value": "Value 1"
+      },
+      {
+        "key": "setting2",
+        "value": 200
+      },
+      {
+        "key": "setting3",
+        "value": true
+      },
+      {
+        "key": "setting6",
+        "nested": true,
+        "value": [
+          {
+            "key": "key",
+            "value": "value"
+          },
+          {
+            "key": "doge",
+            "nested": true,
+            "value": [
+              {
+                "key": "wow",
+                "value": ""
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "group1",
+    "nested": true,
+    "value": [
+      {
+        "key": "baz",
+        "value": "bas"
+      },
+      {
+        "key": "foo",
+        "value": "bar"
+      },
+      {
+        "key": "nest",
+        "nested": true,
+        "value": [
+          {
+            "key": "key",
+            "value": "value"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "group2",
+    "nested": true,
+    "value": [
+      {
+        "key": "abc",
+        "value": 12345
+      },
+      {
+        "key": "deep",
+        "nested": true,
+        "value": [
+          {
+            "key": "id",
+            "value": 45
+          }
+        ]
+      }
+    ]
+  }
+]
