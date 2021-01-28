@@ -10,3 +10,4 @@
 ### asciinema
 usage https://asciinema.org/connect/b3f868b1-b387-4468-a972-2f0261d7552c
 yml support: https://asciinema.org/connect/b3f868b1-b387-4468-a972-2f0261d7552c
+nested files support: https://asciinema.org/a/aXfwZfqYZmarn8rXpLzkH5mB3

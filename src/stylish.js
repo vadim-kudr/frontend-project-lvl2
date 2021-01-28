@@ -1,59 +1,41 @@
-const isVisibleOp = (op) => op !== '=' && op !== '!=' && op !== undefined;
+import _ from 'lodash';
 
-function buildString(key, op, value, level) {
-  const prefix = '  '.repeat(level);
-  const newOp = isVisibleOp(op) ? op : ' ';
-  const valuePrefix = value !== '' ? ' ' : '';
-
-  return `${prefix}${newOp} ${key}:${valuePrefix}${value}`;
+function makeSubTreeString(key, op, keys, prefix) {
+  const formattedValue = keys.join('\n')
+  return `${prefix}${op} ${key}: {\n${formattedValue}\n${prefix}  }`;
 }
 
-function formatTreeNode(node, key = '', op = ' ', level = 0) {
-  if (!Array.isArray(node)) {
-    return buildString(key, op, node, level);
+function makeKeyValueString(key, op, value, level) {
+  const prefix = '  '.repeat(level);
+  const valuePrefix = value !== '' ? ' ' : '';
+
+  if (_.isArray(value)) {
+    const keys = value.map((item) => {
+      const { key, op, value } = item;
+      return makeKeyValueString(key, op, value, level + 2);
+    });
+
+    return makeSubTreeString(key, op, keys, prefix);
   }
 
-  const isSubTree = !!key;
-  const nextLevel = level + (isSubTree ? 2 : 1);
+  if (_.isObject(value)) {
+    const keys = Object.keys(value)
+      .sort()
+      .map((key) => {
+        return makeKeyValueString(key, ' ', value[key], level + 2);
+      });
 
-  const diffs = node.reduce((acc, item) => {
-    const { key, op, value } = item;
-
-    if (Array.isArray(value)) {
-      return acc.concat(formatTreeNode(value, key, op, nextLevel));
-    }
-
-    if (op === '!=') {
-      const { before, after } = value;
-
-      const beforeDiffs = formatTreeNode(before, key, '-', nextLevel);
-      const afterDiffs = formatTreeNode(after, key, '+', nextLevel);
-
-      return acc.concat(beforeDiffs, afterDiffs);
-    }
-
-    return acc.concat(buildString(key, op, value, nextLevel));
-  }, []);
-
-  if (isSubTree) {
-    const prefix = '  '.repeat(level);
-    const newOp = isVisibleOp(op) ? op : ' ';
-    return [
-      `${prefix}${newOp} ${key}: {`,
-      ...diffs,
-      `${prefix}  }`,
-    ];
+    return makeSubTreeString(key, op, keys, prefix);
   }
 
-  return diffs;
+  return `${prefix}${op} ${key}:${valuePrefix}${value}`;
 }
 
 export default function stylishFormatter(diff) {
-  const diffs = formatTreeNode(diff);
+  const diffs = diff.map(node => {
+    const { key, op, value } = node;
+    return makeKeyValueString(key, op, value, 1);
+  });
 
-  return [
-    '{',
-    ...diffs,
-    '}',
-  ].join('\n');
+  return ['{', ...diffs, '}'].join('\n');
 }

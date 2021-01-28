@@ -1,76 +1,71 @@
 import _ from 'lodash';
 import { parseFile } from './parsers.js';
-import buildTree from './buildTree.js';
 import stylishFormatter from './stylish.js';
 
-function formatNodeValue(node) {
-  const { nested, value } = node;
-
-  if (nested) {
-    return compareTrees(node.value, node.value);
-  }
-
-  return value;
-}
-
-export function compareNodes(key, nodeA, nodeB) {
-  const { nested: nestedA, value: valueA } = nodeA || {};
-  const { nested: nestedB, value: valueB } = nodeB || {};
-
-  if (nestedA && nestedB) {
+export function compareNodes(key, valueA, valueB) {
+  if (valueA !== undefined && valueB === undefined) {
     return {
       key,
-      value: compareTrees(valueA, valueB),
-      op: '=',
-    };
-  }
-
-  if (nodeA && nodeB === undefined) {
-    return {
-      key,
-      value: formatNodeValue(nodeA),
+      value: valueA,
       op: '-',
     };
   }
 
-  if (nodeA === undefined && nodeB) {
+  if (valueA === undefined && valueB !== undefined) {
     return {
       key,
-      value: formatNodeValue(nodeB),
+      value: valueB,
       op: '+',
     };
   }
 
-  if (_.isEqual(nodeA, nodeB)) {
+  if (_.isEqual(valueA, valueB)) {
     return {
       key,
       value: valueA,
-      op: '=',
+      op: ' ',
     };
   }
 
-  return {
-    key,
-    value: {
-      before: valueA,
-      after: valueB,
+  return [
+    {
+      key,
+      value: valueA,
+      op: '-',
     },
-    op: '!=',
-  };
+    {
+      key,
+      value: valueB,
+      op: '+',
+    },
+  ];
 }
 
 export function compareTrees(nodeA, nodeB) {
-  const keysA = nodeA.map((node) => node.key);
-  const keysB = nodeB.map((node) => node.key);
+  const keysA = Object.keys(nodeA || {});
+  const keysB = Object.keys(nodeB || {});
 
   const keys = _.union(keysA, keysB).sort();
 
-  const diffs = keys.map((key) => {
-    const valueA = nodeA.find((node) => node.key === key);
-    const valueB = nodeB.find((node) => node.key === key);
+  const diffs = keys.flatMap((key) => {
+    const valueA = nodeA && nodeA[key];
+    const valueB = nodeB && nodeB[key];
+
+    const isTreeA = _.isObject(valueA);
+    const isTreeB = _.isObject(valueB);
+
+    if (isTreeA && isTreeB) {
+      return {
+        key,
+        value: compareTrees(valueA, valueB),
+        op: ' ',
+      };
+    }
 
     return compareNodes(key, valueA, valueB);
   });
+
+  // console.log(JSON.stringify(diffs, null, 2));
 
   return diffs;
 }
@@ -79,12 +74,9 @@ export default function genDiff(filepath1, filepath2) {
   const fileA = parseFile(filepath1);
   const fileB = parseFile(filepath2);
 
-  const treeA = buildTree(fileA);
-  const treeB = buildTree(fileB);
+  const diff = compareTrees(fileA, fileB);
 
-  const diff = compareTrees(treeA, treeB);
-
-  console.log(JSON.stringify(diff, null, 2));
+  // console.log(JSON.stringify(diff, null, 2));
 
   return stylishFormatter(diff);
 }

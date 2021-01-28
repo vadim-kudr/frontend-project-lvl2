@@ -14,9 +14,12 @@ export function parseFile(filepath) {
     const ext = path.extname(filepath);
 
     switch (ext) {
-      case '.json': return JSON.parse(content);
-      case '.yml': return yaml.load(content);
-      default: return undefined;
+      case '.json':
+        return JSON.parse(content);
+      case '.yml':
+        return yaml.load(content);
+      default:
+        return undefined;
     }
   } catch (error) {
     return undefined;
