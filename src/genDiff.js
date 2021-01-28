@@ -1,34 +1,21 @@
-import fs from 'fs';
-import path from 'path';
-
 import _ from 'lodash';
-
-function readJsonFile(filepath) {
-  const resolvedPath = path.resolve(filepath);
-  const fileContent = fs.readFileSync(resolvedPath);
-
-  return JSON.parse(fileContent);
-}
+import { parseFile } from './parsers.js';
 
 export default function genDiff(filepath1, filepath2) {
-  const jsonA = readJsonFile(filepath1);
-  const jsonB = readJsonFile(filepath2);
+  const fileA = parseFile(filepath1);
+  const fileB = parseFile(filepath2);
 
   const prefix = '  ';
-  const keys = _.union(Object.keys(jsonA), Object.keys(jsonB)).sort();
+  const keys = _.union(Object.keys(fileA), Object.keys(fileB)).sort();
 
   const diffs = keys.map((key) => {
     /* eslint-disable no-prototype-builtins */
-    const hasA = jsonA.hasOwnProperty(key);
-    const hasB = jsonB.hasOwnProperty(key);
+    const hasA = fileA.hasOwnProperty(key);
+    const hasB = fileB.hasOwnProperty(key);
     /* eslint-disable no-prototype-builtins */
 
-    const valueA = jsonA[key];
-    const valueB = jsonB[key];
-
-    if (valueA === valueB) {
-      return `${prefix}  ${key}: ${valueA}`;
-    }
+    const valueA = fileA[key];
+    const valueB = fileB[key];
 
     if (hasA && !hasB) {
       return `${prefix}- ${key}: ${valueA}`;
@@ -36,6 +23,10 @@ export default function genDiff(filepath1, filepath2) {
 
     if (!hasA && hasB) {
       return `${prefix}+ ${key}: ${valueB}`;
+    }
+
+    if (valueA === valueB) {
+      return `${prefix}  ${key}: ${valueA}`;
     }
 
     return `${prefix}- ${key}: ${valueA}\n${prefix}+ ${key}: ${valueB}`;
