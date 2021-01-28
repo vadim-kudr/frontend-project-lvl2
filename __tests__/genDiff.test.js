@@ -9,10 +9,8 @@ import stylishFormatter from '../src/stylish';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const getFixturePath = (filename) =>
-  path.join(__dirname, '..', '__fixtures__', filename);
-const readFile = (filename) =>
-  fs.readFileSync(getFixturePath(filename), 'utf-8');
+const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
+const readFile = (filename) => fs.readFileSync(getFixturePath(filename), 'utf-8');
 
 describe('format flat tree', () => {
   const valueA = 1;
@@ -99,23 +97,27 @@ describe('format nested tree', () => {
     expect(compareTrees(valueA, valueC)).toEqual(result);
   });
 });
-/*
+
 describe('test formatters', () => {
   test('stylish', () => {
-    const tree = [{
-      key: 'a',
-      value: [
-        {
-          key: 'b',
-          value: {
-            before: 2,
-            after: 3,
+    const tree = [
+      {
+        key: 'a',
+        value: [
+          {
+            key: 'b',
+            value: 2,
+            op: '-',
           },
-          op: '!=',
-        },
-      ],
-      op: '=',
-    }];
+          {
+            key: 'b',
+            value: 3,
+            op: '+',
+          },
+        ],
+        op: ' ',
+      },
+    ];
 
     const result = [
       '{',
@@ -130,7 +132,7 @@ describe('test formatters', () => {
     expect(text).toEqual(result);
   });
 });
-*/
+
 describe('test diff', () => {
   test('one level json', () => {
     const filepath1 = getFixturePath('flat1.json');

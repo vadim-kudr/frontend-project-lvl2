@@ -65,18 +65,17 @@ export function compareTrees(nodeA, nodeB) {
     return compareNodes(key, valueA, valueB);
   });
 
-  // console.log(JSON.stringify(diffs, null, 2));
-
   return diffs;
 }
 
-export default function genDiff(filepath1, filepath2) {
+export default function genDiff(filepath1, filepath2, format) {
   const fileA = parseFile(filepath1);
   const fileB = parseFile(filepath2);
 
   const diff = compareTrees(fileA, fileB);
 
-  // console.log(JSON.stringify(diff, null, 2));
-
-  return stylishFormatter(diff);
+  switch (format) {
+    case 'stylish': return stylishFormatter(diff);
+    default: throw new Error(`non supported format ${format}`);
+  }
 }

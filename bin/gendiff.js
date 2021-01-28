@@ -16,13 +16,14 @@ function parseCommandLine() {
     .helpOption('-h, --help', 'output usage information')
     .option('-f, --format [type]', 'output format', 'stylish')
     .action((filepath1, filepath2) => {
-      const { format } = program;
+      const { format } = program.opts();
+
       const diff = genDiff(filepath1, filepath2, format);
 
       console.log(diff);
     });
 
-  program.parse();
+  program.parse(process.argv);
 }
 
 parseCommandLine();
