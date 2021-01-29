@@ -13,19 +13,19 @@ function makeValueString(value) {
 function makeOperationDesc(op, value, nextValue) {
   switch (op) {
     case '+': return `added with value: ${makeValueString(value)}`;
-    case '-': return `removed`;
+    case '-': return 'removed';
     case 'u': {
       const before = makeValueString(value);
       const after = makeValueString(nextValue);
       return `updated. From ${before} to ${after}`;
     }
     default: return null;
-  };
+  }
 }
 
 function makeOperationString(operation) {
   const {
-    key, op, value, nextValue
+    key, op, value, nextValue,
   } = operation;
 
   const desc = makeOperationDesc(op, value, nextValue);
@@ -35,12 +35,12 @@ function makeOperationString(operation) {
   return `Property '${key}' was ${desc}`;
 }
 
-const getKeyPath = (path, key) => path ? `${path}.${key}` : key;
+const getKeyPath = (path, key) => (path ? `${path}.${key}` : key);
 
 export function flatTree(tree, path = '') {
   return tree.reduce((acc, node, index) => {
     const { key, op, value } = node;
-    const { key: prevKey, op: prevOp} = tree[index - 1] || {};
+    const { key: prevKey, op: prevOp } = tree[index - 1] || {};
 
     const keyPath = getKeyPath(path, key);
     const prevKeyPath = getKeyPath(path, prevKey);
@@ -61,7 +61,7 @@ export function flatTree(tree, path = '') {
     acc.push({
       key: keyPath,
       op,
-      value
+      value,
     });
 
     return acc;
@@ -72,7 +72,7 @@ export default function plainFormatter(tree) {
   const resultTree = flatTree(tree);
 
   return resultTree
-    .map(operation => makeOperationString(operation))
+    .map((operation) => makeOperationString(operation))
     .filter(Boolean)
     .join('\n');
 }

@@ -97,9 +97,7 @@ describe('format nested tree', () => {
   });
 });
 
-
-
-describe('test diff', () => {
+describe('test genDiff', () => {
   test('one level json', () => {
     const filepath1 = getFixturePath('flat1.json');
     const filepath2 = getFixturePath('flat2.json');
@@ -127,7 +125,7 @@ describe('test diff', () => {
     expect(diff).toBe(diffFixture);
   });
 
-  test('nested json plain', () => {
+  test('nested json, plain formatter', () => {
     const filepath1 = getFixturePath('nested1.json');
     const filepath2 = getFixturePath('nested2.json');
     const diffFixture = readFile('nested_diff_plain.txt');
