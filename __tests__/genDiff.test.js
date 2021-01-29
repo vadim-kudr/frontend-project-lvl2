@@ -4,7 +4,6 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import genDiff, { compareNodes, compareTrees } from '../src/genDiff';
-import stylishFormatter from '../src/stylish';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -98,40 +97,7 @@ describe('format nested tree', () => {
   });
 });
 
-describe('test formatters', () => {
-  test('stylish', () => {
-    const tree = [
-      {
-        key: 'a',
-        value: [
-          {
-            key: 'b',
-            value: 2,
-            op: '-',
-          },
-          {
-            key: 'b',
-            value: 3,
-            op: '+',
-          },
-        ],
-        op: ' ',
-      },
-    ];
 
-    const result = [
-      '{',
-      '    a: {',
-      '      - b: 2',
-      '      + b: 3',
-      '    }',
-      '}',
-    ].join('\n');
-
-    const text = stylishFormatter(tree);
-    expect(text).toEqual(result);
-  });
-});
 
 describe('test diff', () => {
   test('one level json', () => {
@@ -139,7 +105,7 @@ describe('test diff', () => {
     const filepath2 = getFixturePath('flat2.json');
     const diffFixture = readFile('flat_diff.txt');
 
-    const diff = genDiff(filepath1, filepath2);
+    const diff = genDiff(filepath1, filepath2, 'stylish');
     expect(diff).toBe(diffFixture);
   });
 
@@ -148,7 +114,7 @@ describe('test diff', () => {
     const filepath2 = getFixturePath('flat2.yml');
     const diffFixture = readFile('flat_diff.txt');
 
-    const diff = genDiff(filepath1, filepath2);
+    const diff = genDiff(filepath1, filepath2, 'stylish');
     expect(diff).toBe(diffFixture);
   });
 
@@ -157,7 +123,16 @@ describe('test diff', () => {
     const filepath2 = getFixturePath('nested2.json');
     const diffFixture = readFile('nested_diff.txt');
 
-    const diff = genDiff(filepath1, filepath2);
+    const diff = genDiff(filepath1, filepath2, 'stylish');
+    expect(diff).toBe(diffFixture);
+  });
+
+  test('nested json plain', () => {
+    const filepath1 = getFixturePath('nested1.json');
+    const filepath2 = getFixturePath('nested2.json');
+    const diffFixture = readFile('nested_diff_plain.txt');
+
+    const diff = genDiff(filepath1, filepath2, 'plain');
     expect(diff).toBe(diffFixture);
   });
 });

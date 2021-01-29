@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { parseFile } from './parsers.js';
-import stylishFormatter from './stylish.js';
+import getFormatter from './formatters/index.js';
 
 export function compareNodes(key, valueA, valueB) {
   if (valueA !== undefined && valueB === undefined) {
@@ -68,14 +68,12 @@ export function compareTrees(nodeA, nodeB) {
   return diffs;
 }
 
-export default function genDiff(filepath1, filepath2, format) {
+export default function genDiff(filepath1, filepath2, formatName) {
   const fileA = parseFile(filepath1);
   const fileB = parseFile(filepath2);
 
   const diff = compareTrees(fileA, fileB);
 
-  switch (format) {
-    case 'stylish': return stylishFormatter(diff);
-    default: throw new Error(`non supported format ${format}`);
-  }
+  const formatter = getFormatter(formatName);
+  return formatter(diff);
 }
