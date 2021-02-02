@@ -56,7 +56,7 @@ export function flatDiffs(diffs, path = '') {
       {
         ...diff,
         key: keyPath,
-      }
+      },
     ];
   }, []);
 }
