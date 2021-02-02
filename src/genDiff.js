@@ -44,7 +44,7 @@ export function compareTrees(nodeA, nodeB) {
   const keysA = Object.keys(nodeA || {});
   const keysB = Object.keys(nodeB || {});
 
-  const keys = _.union(keysA, keysB).sort();
+  const keys = _.union(keysA, keysB).concat().sort();
 
   const diffs = keys.flatMap((key) => {
     const valueA = nodeA && nodeA[key];

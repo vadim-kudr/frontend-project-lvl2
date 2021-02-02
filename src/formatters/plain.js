@@ -51,12 +51,13 @@ export function flatDiffs(diffs, path = '') {
       return acc.concat(subTree);
     }
 
-    acc.push({
-      ...diff,
-      key: keyPath,
-    });
-
-    return acc;
+    return [
+      ...acc,
+      {
+        ...diff,
+        key: keyPath,
+      }
+    ];
   }, []);
 }
 
