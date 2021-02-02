@@ -4,6 +4,9 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import genDiff, { compareNodes, compareTrees } from '../src/genDiff';
+import {
+  EXISTS, ADDED, REMOVED, UPDATED,
+} from '../src/constants';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,7 +25,7 @@ describe('format flat tree', () => {
     const result = {
       key: 'a',
       value: 1,
-      op: '-',
+      op: REMOVED,
     };
 
     expect(compareNodes('a', valueA, valueB)).toEqual(result);
@@ -32,7 +35,7 @@ describe('format flat tree', () => {
     const result = {
       key: 'a',
       value: 1,
-      op: '+',
+      op: ADDED,
     };
 
     expect(compareNodes('a', valueB, valueA)).toEqual(result);
@@ -42,7 +45,7 @@ describe('format flat tree', () => {
     const result = {
       key: 'a',
       value: 1,
-      op: ' ',
+      op: EXISTS,
     };
 
     expect(compareNodes('a', valueA, valueA)).toEqual(result);
@@ -50,8 +53,9 @@ describe('format flat tree', () => {
 
   test('not equal', () => {
     const result = [
-      { key: 'a', op: '-', value: 1 },
-      { key: 'a', op: '+', value: 2 },
+      {
+        key: 'a', op: UPDATED, value: 2, prevValue: 1,
+      },
     ];
 
     expect(compareNodes('a', valueA, valueC)).toEqual(result);
@@ -70,27 +74,28 @@ describe('format nested tree', () => {
   };
 
   test('exists in A', () => {
-    const result = [{ key: 'b', op: '-', value: 2 }];
+    const result = [{ key: 'b', op: REMOVED, value: 2 }];
 
     expect(compareTrees(valueA, valueB)).toEqual(result);
   });
 
   test('exists in B', () => {
-    const result = [{ key: 'b', op: '+', value: 2 }];
+    const result = [{ key: 'b', op: ADDED, value: 2 }];
 
     expect(compareTrees(valueB, valueA)).toEqual(result);
   });
 
   test('equal', () => {
-    const result = [{ key: 'b', op: ' ', value: 2 }];
+    const result = [{ key: 'b', op: EXISTS, value: 2 }];
 
     expect(compareTrees(valueA, valueA)).toEqual(result);
   });
 
   test('not equal', () => {
     const result = [
-      { key: 'b', op: '-', value: 2 },
-      { key: 'b', op: '+', value: 3 },
+      {
+        key: 'b', op: UPDATED, value: 3, prevValue: 2,
+      },
     ];
 
     expect(compareTrees(valueA, valueC)).toEqual(result);
@@ -116,7 +121,7 @@ describe('test genDiff', () => {
     expect(diff).toBe(diffFixture);
   });
 
-  test('nested json', () => {
+  test('nested json, stylish formatter', () => {
     const filepath1 = getFixturePath('nested1.json');
     const filepath2 = getFixturePath('nested2.json');
     const diffFixture = readFile('nested_diff.txt');

@@ -1,6 +1,7 @@
 import _ from 'lodash';
+import { ADDED, REMOVED, UPDATED } from '../constants.js';
 
-function makeValueString(value) {
+function formatDiffValue(value) {
   if (_.isObject(value) || _.isArray(value)) {
     return '[complex value]';
   }
@@ -10,25 +11,25 @@ function makeValueString(value) {
   return value;
 }
 
-function makeOperationDesc(op, value, nextValue) {
+function makeDiffDesc(diff) {
+  const { op, value, prevValue } = diff;
+
   switch (op) {
-    case '+': return `added with value: ${makeValueString(value)}`;
-    case '-': return 'removed';
-    case 'u': {
-      const before = makeValueString(value);
-      const after = makeValueString(nextValue);
+    case ADDED: return `added with value: ${formatDiffValue(value)}`;
+    case REMOVED: return 'removed';
+    case UPDATED: {
+      const before = formatDiffValue(prevValue);
+      const after = formatDiffValue(value);
       return `updated. From ${before} to ${after}`;
     }
     default: return null;
   }
 }
 
-function makeOperationString(operation) {
-  const {
-    key, op, value, nextValue,
-  } = operation;
+function formatDiff(diff) {
+  const { key } = diff;
 
-  const desc = makeOperationDesc(op, value, nextValue);
+  const desc = makeDiffDesc(diff);
   if (!desc) {
     return null;
   }
@@ -37,42 +38,33 @@ function makeOperationString(operation) {
 
 const getKeyPath = (path, key) => (path ? `${path}.${key}` : key);
 
-export function flatTree(tree, path = '') {
-  return tree.reduce((acc, node, index) => {
-    const { key, op, value } = node;
-    const { key: prevKey, op: prevOp } = tree[index - 1] || {};
+export function flatDiffs(diffs, path = '') {
+  return diffs.reduce((acc, diff) => {
+    const {
+      key, value,
+    } = diff;
 
     const keyPath = getKeyPath(path, key);
-    const prevKeyPath = getKeyPath(path, prevKey);
 
     if (_.isArray(value)) {
-      const subTree = flatTree(value, keyPath);
+      const subTree = flatDiffs(value, keyPath);
       return acc.concat(subTree);
     }
 
-    const isUpdate = prevKeyPath === keyPath && prevOp === '-' && op === '+';
-    if (isUpdate) {
-      const lastItem = acc[acc.length - 1];
-      lastItem.op = 'u';
-      lastItem.nextValue = value;
-      return acc;
-    }
-
     acc.push({
+      ...diff,
       key: keyPath,
-      op,
-      value,
     });
 
     return acc;
   }, []);
 }
 
-export default function plainFormatter(tree) {
-  const resultTree = flatTree(tree);
+export default function plainFormatter(diffs) {
+  const preparedDiffs = flatDiffs(diffs);
 
-  return resultTree
-    .map((operation) => makeOperationString(operation))
+  return preparedDiffs
+    .reduce((acc, diff) => acc.concat(formatDiff(diff)), [])
     .filter(Boolean)
     .join('\n');
 }

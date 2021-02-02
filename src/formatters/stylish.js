@@ -1,40 +1,54 @@
 import _ from 'lodash';
+import {
+  ADDED, EXISTS, REMOVED, UPDATED,
+} from '../constants.js';
 
-function makeSubTreeString(key, op, keys, prefix) {
-  const value = keys.join('\n');
-  return `${prefix}${op} ${key}: {\n${value}\n${prefix}  }`;
+function formatSubTree(key, op, diffs, prefix) {
+  const value = diffs.join('\n');
+  return `${prefix}${op || EXISTS} ${key}: {\n${value}\n${prefix}  }`;
 }
 
-function makeKeyValueString(key, op, value, level) {
+function formatDiff(diff, level) {
+  const {
+    key, op, value, prevValue,
+  } = diff;
+
+  const subTreeLevel = 2;
   const prefix = '  '.repeat(level);
-  const valuePrefix = value !== '' ? ' ' : '';
 
   if (_.isArray(value)) {
-    const keys = value.map((item) => {
-      /* eslint-disable no-shadow */
-      const { key, op, value } = item;
-      return makeKeyValueString(key, op, value, level + 2);
-    });
-
-    return makeSubTreeString(key, op, keys, prefix);
+    const diffs = value.map((subTreeDiff) => formatDiff(subTreeDiff, level + subTreeLevel));
+    return formatSubTree(key, op, diffs, prefix);
   }
 
   if (_.isObject(value)) {
-    const keys = Object.keys(value)
+    const diffs = Object.keys(value)
       .sort()
-      .map((key) => makeKeyValueString(key, ' ', value[key], level + 2));
+      .map((subTreeKey) => {
+        const newDiff = {
+          key: subTreeKey,
+          value: value[subTreeKey],
+          op: EXISTS,
+        };
+        return formatDiff(newDiff, level + subTreeLevel);
+      });
 
-    return makeSubTreeString(key, op, keys, prefix);
+    return formatSubTree(key, op, diffs, prefix);
   }
 
+  if (op === UPDATED) {
+    return [
+      formatDiff({ key, op: REMOVED, value: prevValue }, level),
+      formatDiff({ key, op: ADDED, value }, level),
+    ].join('\n');
+  }
+
+  const valuePrefix = value !== '' ? ' ' : '';
   return `${prefix}${op} ${key}:${valuePrefix}${value}`;
 }
 
-export default function stylishFormatter(diff) {
-  const diffs = diff.map((node) => {
-    const { key, op, value } = node;
-    return makeKeyValueString(key, op, value, 1);
-  });
+export default function stylishFormatter(diffs) {
+  const lines = diffs.map((diff) => formatDiff(diff, 1));
 
-  return ['{', ...diffs, '}'].join('\n');
+  return ['{', ...lines, '}'].join('\n');
 }

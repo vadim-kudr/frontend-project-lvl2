@@ -1,13 +1,16 @@
 import _ from 'lodash';
 import { parseFile } from './parsers.js';
 import getFormatter from './formatters/index.js';
+import {
+  EXISTS, ADDED, REMOVED, UPDATED,
+} from './constants.js';
 
 export function compareNodes(key, valueA, valueB) {
   if (valueA !== undefined && valueB === undefined) {
     return {
       key,
       value: valueA,
-      op: '-',
+      op: REMOVED,
     };
   }
 
@@ -15,7 +18,7 @@ export function compareNodes(key, valueA, valueB) {
     return {
       key,
       value: valueB,
-      op: '+',
+      op: ADDED,
     };
   }
 
@@ -23,20 +26,16 @@ export function compareNodes(key, valueA, valueB) {
     return {
       key,
       value: valueA,
-      op: ' ',
+      op: EXISTS,
     };
   }
 
   return [
     {
       key,
-      value: valueA,
-      op: '-',
-    },
-    {
-      key,
+      prevValue: valueA,
       value: valueB,
-      op: '+',
+      op: UPDATED,
     },
   ];
 }
@@ -58,7 +57,7 @@ export function compareTrees(nodeA, nodeB) {
       return {
         key,
         value: compareTrees(valueA, valueB),
-        op: ' ',
+        op: EXISTS,
       };
     }
 

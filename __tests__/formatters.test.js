@@ -1,5 +1,8 @@
 import stylishFormatter from '../src/formatters/stylish';
-import { flatTree } from '../src/formatters/plain';
+import { flatDiffs } from '../src/formatters/plain';
+import {
+  EXISTS, ADDED, UPDATED,
+} from '../src/constants.js';
 
 describe('stylish formatter', () => {
   test('nested tree', () => {
@@ -9,16 +12,19 @@ describe('stylish formatter', () => {
         value: [
           {
             key: 'b',
-            value: 2,
-            op: '-',
+            value: 3,
+            prevValue: 2,
+            op: UPDATED,
           },
           {
-            key: 'b',
-            value: 3,
-            op: '+',
+            key: 'd',
+            value: {
+              e: 4,
+            },
+            op: ADDED,
           },
         ],
-        op: ' ',
+        op: EXISTS,
       },
     ];
 
@@ -27,6 +33,9 @@ describe('stylish formatter', () => {
       '    a: {',
       '      - b: 2',
       '      + b: 3',
+      '      + d: {',
+      '            e: 4',
+      '        }',
       '    }',
       '}',
     ].join('\n');
@@ -37,69 +46,61 @@ describe('stylish formatter', () => {
 });
 
 describe('plain formatter', () => {
-  test('flatTree: base operations', () => {
+  test('flatDiffs: base operations', () => {
     const tree = [
       {
         key: 'a',
-        value: 1,
-        op: '-',
-      },
-      {
-        key: 'a',
         value: 2,
-        op: '+',
+        prevValue: 1,
+        op: UPDATED,
       },
       {
         key: 'b',
         value: 3,
-        op: '+',
+        op: ADDED,
       },
     ];
 
     const result = [
       {
-        key: 'a', op: 'u', value: 1, nextValue: 2,
+        key: 'a', op: UPDATED, value: 2, prevValue: 1,
       },
-      { key: 'b', op: '+', value: 3 },
+      { key: 'b', op: ADDED, value: 3 },
     ];
 
-    const text = flatTree(tree);
+    const text = flatDiffs(tree);
     expect(text).toEqual(result);
   });
 
-  test('flatTree: nested tree operations', () => {
+  test('flatDiffs: nested tree operations', () => {
     const tree = [
       {
         key: 'a',
         value: [
           {
             key: 'b',
-            value: 2,
-            op: '-',
-          },
-          {
-            key: 'b',
             value: 3,
-            op: '+',
+            prevValue: 2,
+            op: UPDATED,
           },
         ],
-        op: ' ',
+        op: EXISTS,
       },
       {
         key: 'c',
         value: 4,
-        op: '+',
+        op: ADDED,
       },
     ];
 
     const result = [
       {
-        key: 'a.b', op: 'u', value: 2, nextValue: 3,
+        key: 'a.b', op: UPDATED, value: 3, prevValue: 2,
       },
-      { key: 'c', op: '+', value: 4 },
+      { key: 'c', op: ADDED, value: 4 },
     ];
 
-    const resultTree = flatTree(tree);
+    const resultTree = flatDiffs(tree);
     expect(resultTree).toEqual(result);
   });
 });
