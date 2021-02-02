@@ -21,6 +21,13 @@ function formatDiff(diff, level) {
     return formatSubTree(key, op, diffs, prefix);
   }
 
+  if (op === UPDATED) {
+    return [
+      formatDiff({ key, op: REMOVED, value: prevValue }, level),
+      formatDiff({ key, op: ADDED, value }, level),
+    ].join('\n');
+  }
+
   if (_.isObject(value)) {
     const diffs = Object.keys(value)
       .sort()
@@ -34,13 +41,6 @@ function formatDiff(diff, level) {
       });
 
     return formatSubTree(key, op, diffs, prefix);
-  }
-
-  if (op === UPDATED) {
-    return [
-      formatDiff({ key, op: REMOVED, value: prevValue }, level),
-      formatDiff({ key, op: ADDED, value }, level),
-    ].join('\n');
   }
 
   const valuePrefix = value !== '' ? ' ' : '';
