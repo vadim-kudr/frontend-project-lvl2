@@ -67,7 +67,7 @@ export function compareTrees(nodeA, nodeB) {
   return diffs;
 }
 
-export default function genDiff(filepath1, filepath2, formatName) {
+export default function genDiff(filepath1, filepath2, formatName = 'stylish') {
   const fileA = parseFile(filepath1);
   const fileB = parseFile(filepath2);
 

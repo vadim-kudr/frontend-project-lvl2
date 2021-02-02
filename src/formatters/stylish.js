@@ -30,7 +30,6 @@ function formatDiff(diff, level) {
 
   if (_.isObject(value)) {
     const diffs = Object.keys(value)
-      .sort()
       .map((subTreeKey) => {
         const newDiff = {
           key: subTreeKey,
@@ -43,8 +42,7 @@ function formatDiff(diff, level) {
     return formatSubTree(key, op, diffs, prefix);
   }
 
-  const valuePrefix = value !== '' ? ' ' : '';
-  return `${prefix}${op} ${key}:${valuePrefix}${value}`;
+  return `${prefix}${op} ${key}: ${value}`;
 }
 
 export default function stylishFormatter(diffs) {
