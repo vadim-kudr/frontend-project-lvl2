@@ -1,3 +1,13 @@
+### Hexlet tests and linter status:
+[![Actions Status](https://github.com/vadim-kudr/frontend-project-lvl2/workflows/hexlet-check/badge.svg)](https://github.com/vadim-kudr/frontend-project-lvl2/actions/workflows/hexlet-check.yml)
+
+[![lint & test](https://github.com/vadim-kudr/frontend-project-lvl2/workflows/lint%20&%20test/badge.svg)](https://github.com/vadim-kudr/frontend-project-lvl2/actions/workflows/check.yml)
+
+[![Maintainability](https://api.codeclimate.com/v1/badges/27fa21068d56a2a4b9d9/maintainability)](https://codeclimate.com/github/vadim-kudr/frontend-project-lvl2/maintainability)
+
+[![Test Coverage](https://api.codeclimate.com/v1/badges/27fa21068d56a2a4b9d9/test_coverage)](https://codeclimate.com/github/vadim-kudr/frontend-project-lvl2/test_coverage)
+
+
 ### Проект "Вычислитель отличий"
 Позволяет сравнивать файлы конфигурации в формате json/yml и выводить их различия. Вывод различий происходит в текстовом формате и доступен в 3х вариантах:
 
@@ -25,15 +35,6 @@ const formattedDiff = genDiff(filepath1, filepath2, formatter);
 Для установки потребуется node.js >= 14 версии и unix подобная среда.
 Далее скачиваем репозиторий `git clone https://github.com/vadim-kudr/frontend-project-lvl2.git`
 И устанавливаем зависимости `make install`
-
-### Hexlet tests and linter status:
-[![Actions Status](https://github.com/vadim-kudr/frontend-project-lvl2/actions/workflows/hexlet-check.yml)](https://github.com/vadim-kudr/frontend-project-lvl2/workflows/hexlet-check/badge.svg)
-
-[![lint & test](https://github.com/vadim-kudr/frontend-project-lvl2/actions/workflows/check.yml)](https://github.com/vadim-kudr/frontend-project-lvl2/workflows/lint%20&%20test/badge.svg)
-
-[![Maintainability](https://api.codeclimate.com/v1/badges/27fa21068d56a2a4b9d9/maintainability)](https://codeclimate.com/github/vadim-kudr/frontend-project-lvl2/maintainability)
-
-[![Test Coverage](https://api.codeclimate.com/v1/badges/27fa21068d56a2a4b9d9/test_coverage)](https://codeclimate.com/github/vadim-kudr/frontend-project-lvl2/test_coverage)
 
 ### asciinema
 usage https://asciinema.org/a/Tktc4vLkxZuB23RBovCCPsgRq
