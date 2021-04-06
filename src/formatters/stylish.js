@@ -24,7 +24,7 @@ function formatNestedValue(values, level) {
   const prefix = '    '.repeat(level);
   const blockRows = [
     '{',
-    values.join('\n'),
+    ...values,
     `${prefix}}`,
   ];
   return blockRows.join('\n');
