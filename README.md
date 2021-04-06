@@ -1,19 +1,45 @@
-### Hexlet tests and linter status:
-[![Actions Status](https://github.com/vadim-kudr/frontend-project-lvl2/workflows/hexlet-check/badge.svg)](https://github.com/vadim-kudr/frontend-project-lvl2/actions)
+### Проект "Вычислитель отличий"
+Позволяет сравнивать файлы конфигурации в формате json/yml и выводить их различия. Вывод различий происходит в текстовом формате и доступен в 3х вариантах:
 
-![lint & test](https://github.com/vadim-kudr/frontend-project-lvl2/workflows/lint%20&%20test/badge.svg)
+* plain - 
+* stylish -
+* json - 
+
+Поставляется в виде npm пакета библиотеки и исполняемого файла.
+
+Пример использования:
+
+```
+import genDiff from '@hexlet/code';
+
+const filepath1 = 'config1.json';
+const filepath2 = 'config2.json';
+const formatter = 'stylish';
+
+const formattedDiff = genDiff(filepath1, filepath2, formatter);
+
+```
+
+### Установка
+
+Для установки потребуется node.js >= 14 версии и unix подобная среда.
+Далее скачиваем репозиторий `git clone https://github.com/vadim-kudr/frontend-project-lvl2.git`
+И устанавливаем зависимости `make install`
+
+### Hexlet tests and linter status:
+[![Actions Status](https://github.com/vadim-kudr/frontend-project-lvl2/actions/workflows/hexlet-check.yml)](https://github.com/vadim-kudr/frontend-project-lvl2/workflows/hexlet-check/badge.svg)
+
+[![lint & test](https://github.com/vadim-kudr/frontend-project-lvl2/actions/workflows/check.yml)](https://github.com/vadim-kudr/frontend-project-lvl2/workflows/lint%20&%20test/badge.svg)
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/27fa21068d56a2a4b9d9/maintainability)](https://codeclimate.com/github/vadim-kudr/frontend-project-lvl2/maintainability)
 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/27fa21068d56a2a4b9d9/test_coverage)](https://codeclimate.com/github/vadim-kudr/frontend-project-lvl2/test_coverage)
 
 ### asciinema
-usage https://asciinema.org/connect/b3f868b1-b387-4468-a972-2f0261d7552c
+usage https://asciinema.org/a/Tktc4vLkxZuB23RBovCCPsgRq
 
-yml support: https://asciinema.org/connect/b3f868b1-b387-4468-a972-2f0261d7552c
+yml support: https://asciinema.org/a/FYlUL36gYMjQHjc1seq8qpGex
 
-nested files support: https://asciinema.org/a/aXfwZfqYZmarn8rXpLzkH5mB3
+plain formatter: https://asciinema.org/a/vtrEAxig9gF4ubxYKjyJlsX4W
 
-plain formatter: https://asciinema.org/a/2JmLDtvCI8EcrbI0pBqny3KCU
-
-json formatter: https://asciinema.org/a/0w6D3YW2R55yOg4rkJOOerwSZ
+json formatter: https://asciinema.org/a/TSde0zXiLZtYUPMRWOSqvtT1G

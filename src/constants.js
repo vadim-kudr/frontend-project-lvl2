@@ -1,4 +1,8 @@
-export const EXISTS = ' ';
-export const REMOVED = '-';
-export const ADDED = '+';
-export const UPDATED = 'u';
+/* eslint-disable import/prefer-default-export */
+export const types = {
+  added: '+',
+  removed: '-',
+  updated: 'u',
+  unchanged: ' ',
+  nested: 'n',
+};

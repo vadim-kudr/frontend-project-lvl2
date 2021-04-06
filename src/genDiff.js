@@ -1,77 +1,22 @@
-import _ from 'lodash';
-import { parseFile } from './parsers.js';
+import fs from 'fs';
+import path from 'path';
+import parse from './parsers.js';
 import getFormatter from './formatters/index.js';
-import {
-  EXISTS, ADDED, REMOVED, UPDATED,
-} from './constants.js';
+import compareTrees from './compareTrees.js';
 
-export function compareNodes(key, valueA, valueB) {
-  if (valueA !== undefined && valueB === undefined) {
-    return {
-      key,
-      value: valueA,
-      op: REMOVED,
-    };
-  }
-
-  if (valueA === undefined && valueB !== undefined) {
-    return {
-      key,
-      value: valueB,
-      op: ADDED,
-    };
-  }
-
-  if (_.isEqual(valueA, valueB)) {
-    return {
-      key,
-      value: valueA,
-      op: EXISTS,
-    };
-  }
-
-  return [
-    {
-      key,
-      prevValue: valueA,
-      value: valueB,
-      op: UPDATED,
-    },
-  ];
-}
-
-export function compareTrees(nodeA, nodeB) {
-  const keysA = Object.keys(nodeA || {});
-  const keysB = Object.keys(nodeB || {});
-
-  const keys = _.orderBy(_.union(keysA, keysB));
-
-  const diffs = keys.flatMap((key) => {
-    const valueA = nodeA && nodeA[key];
-    const valueB = nodeB && nodeB[key];
-
-    const isTreeA = _.isObject(valueA);
-    const isTreeB = _.isObject(valueB);
-
-    if (isTreeA && isTreeB) {
-      return {
-        key,
-        value: compareTrees(valueA, valueB),
-        op: EXISTS,
-      };
-    }
-
-    return compareNodes(key, valueA, valueB);
-  });
-
-  return diffs;
+function readFile(filepath) {
+  const resolvedPath = path.resolve(filepath);
+  return fs.readFileSync(resolvedPath, 'utf8');
 }
 
 export default function genDiff(filepath1, filepath2, formatName = 'stylish') {
-  const fileA = parseFile(filepath1);
-  const fileB = parseFile(filepath2);
+  const fileA = readFile(filepath1);
+  const fileB = readFile(filepath2);
 
-  const diff = compareTrees(fileA, fileB);
+  const dataA = parse(fileA, path.extname(filepath1));
+  const dataB = parse(fileB, path.extname(filepath2));
+
+  const diff = compareTrees(dataA, dataB);
 
   const formatter = getFormatter(formatName);
   return formatter(diff);

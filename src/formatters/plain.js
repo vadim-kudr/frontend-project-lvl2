@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { ADDED, REMOVED, UPDATED } from '../constants.js';
+import { types } from '../constants.js';
 
 function formatDiffValue(value) {
   if (_.isObject(value) || _.isArray(value)) {
@@ -12,17 +12,21 @@ function formatDiffValue(value) {
 }
 
 function makeDiffDesc(diff) {
-  const { op, value, prevValue } = diff;
+  const { operator, value, prevValue } = diff;
 
-  switch (op) {
-    case ADDED: return `added with value: ${formatDiffValue(value)}`;
-    case REMOVED: return 'removed';
-    case UPDATED: {
+  switch (operator) {
+    case types.added: return `added with value: ${formatDiffValue(value)}`;
+    case types.removed: return 'removed';
+    case types.updated: {
       const before = formatDiffValue(prevValue);
       const after = formatDiffValue(value);
       return `updated. From ${before} to ${after}`;
     }
-    default: return null;
+    case types.unchanged:
+    case types.nested:
+      return null;
+    default:
+      throw new Error(`non supported operator ${operator}`);
   }
 }
 
