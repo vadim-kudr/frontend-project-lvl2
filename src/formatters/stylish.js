@@ -18,7 +18,7 @@ const getRow = (key, type, value, level) => {
   return `${prefix}  ${sign} ${key}: ${value}`;
 };
 
-const formatNestedValue = (values, level) => {
+const formatNestedValues = (values, level) => {
   const prefix = getPrefix(level);
   const blockRows = ['{', ...values, `${prefix}}`];
   return blockRows.join('\n');
@@ -26,7 +26,7 @@ const formatNestedValue = (values, level) => {
 
 const formatValue = (key, type, value, level) => {
   if (_.isArray(value)) {
-    const formattedValue = formatNestedValue(value, level);
+    const formattedValue = formatNestedValues(value, level);
     return getRow(key, type, formattedValue, level);
   }
 
@@ -34,7 +34,7 @@ const formatValue = (key, type, value, level) => {
     const rows = Object
       .keys(value)
       .map((childKey) => formatValue(childKey, types.unchanged, value[childKey], level + 1));
-    const formattedValue = formatNestedValue(rows, level);
+    const formattedValue = formatNestedValues(rows, level);
     return getRow(key, type, formattedValue, level);
   }
 
@@ -69,5 +69,5 @@ const formatDiff = (diff, level) => {
 
 export default function stylishFormatter(diffs) {
   const rows = diffs.map((diff) => formatDiff(diff, 1));
-  return formatNestedValue(rows, 0);
+  return formatNestedValues(rows, 0);
 }
