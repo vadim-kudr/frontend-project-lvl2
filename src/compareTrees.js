@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { types } from './constants.js';
+import types from './types.js';
 
 export default function compareTrees(nodeA, nodeB) {
   const keysA = Object.keys(nodeA || {});
@@ -15,7 +15,7 @@ export default function compareTrees(nodeA, nodeB) {
       return {
         key,
         value: valueA,
-        operator: types.removed,
+        type: types.removed,
       };
     }
 
@@ -23,7 +23,7 @@ export default function compareTrees(nodeA, nodeB) {
       return {
         key,
         value: valueB,
-        operator: types.added,
+        type: types.added,
       };
     }
 
@@ -31,23 +31,23 @@ export default function compareTrees(nodeA, nodeB) {
       return {
         key,
         value: compareTrees(valueA, valueB),
-        operator: types.nested,
+        type: types.nested,
       };
     }
 
     if (!_.isEqual(valueA, valueB)) {
       return {
         key,
-        prevValue: valueA,
-        value: valueB,
-        operator: types.updated,
+        valueBefore: valueA,
+        valueAfter: valueB,
+        type: types.updated,
       };
     }
 
     return {
       key,
       value: valueA,
-      operator: types.unchanged,
+      type: types.unchanged,
     };
   });
 

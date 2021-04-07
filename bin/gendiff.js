@@ -5,7 +5,7 @@ import genDiff from '../index.js';
 
 const { Command } = commander;
 
-function parseCommandLine() {
+const parseCommandLine = () => {
   const program = new Command();
 
   program.version('0.0.1', '-V, --version', 'output the version number');
@@ -24,6 +24,6 @@ function parseCommandLine() {
     });
 
   program.parse(process.argv);
-}
+};
 
 parseCommandLine();

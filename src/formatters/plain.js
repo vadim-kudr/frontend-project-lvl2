@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import { types } from '../constants.js';
+import types from '../types.js';
 
-function formatDiffValue(value) {
+const formatDiffValue = (value) => {
   if (_.isObject(value) || _.isArray(value)) {
     return '[complex value]';
   }
@@ -9,28 +9,32 @@ function formatDiffValue(value) {
     return `'${value}'`;
   }
   return value;
-}
+};
 
-function makeDiffDesc(diff) {
-  const { operator, value, prevValue } = diff;
+const makeDiffDesc = (diff) => {
+  const {
+    type, value, valueBefore, valueAfter,
+  } = diff;
 
-  switch (operator) {
-    case types.added: return `added with value: ${formatDiffValue(value)}`;
-    case types.removed: return 'removed';
+  switch (type) {
+    case types.added:
+      return `added with value: ${formatDiffValue(value)}`;
+    case types.removed:
+      return 'removed';
     case types.updated: {
-      const before = formatDiffValue(prevValue);
-      const after = formatDiffValue(value);
+      const before = formatDiffValue(valueBefore);
+      const after = formatDiffValue(valueAfter);
       return `updated. From ${before} to ${after}`;
     }
     case types.unchanged:
     case types.nested:
       return null;
     default:
-      throw new Error(`non supported operator ${operator}`);
+      throw new Error(`non supported node type ${type}`);
   }
-}
+};
 
-function formatDiff(diff) {
+const formatDiff = (diff) => {
   const { key } = diff;
 
   const desc = makeDiffDesc(diff);
@@ -38,15 +42,13 @@ function formatDiff(diff) {
     return null;
   }
   return `Property '${key}' was ${desc}`;
-}
+};
 
 const getKeyPath = (path, key) => (path ? `${path}.${key}` : key);
 
 export function flatDiffs(diffs, path = '') {
   return diffs.reduce((acc, diff) => {
-    const {
-      key, value,
-    } = diff;
+    const { key, value } = diff;
 
     const keyPath = getKeyPath(path, key);
 

@@ -5,35 +5,35 @@
       {
         "key": "follow",
         "value": false,
-        "operator": "+"
+        "type": "added"
       },
       {
         "key": "setting1",
         "value": "Value 1",
-        "operator": " "
+        "type": "unchanged"
       },
       {
         "key": "setting2",
         "value": 200,
-        "operator": "-"
+        "type": "removed"
       },
       {
         "key": "setting3",
-        "prevValue": true,
-        "value": null,
-        "operator": "u"
+        "valueBefore": true,
+        "valueAfter": null,
+        "type": "updated"
       },
       {
         "key": "setting4",
         "value": "blah blah",
-        "operator": "+"
+        "type": "added"
       },
       {
         "key": "setting5",
         "value": {
           "key5": "value5"
         },
-        "operator": "+"
+        "type": "added"
       },
       {
         "key": "setting6",
@@ -43,53 +43,53 @@
             "value": [
               {
                 "key": "wow",
-                "prevValue": "",
-                "value": "so much",
-                "operator": "u"
+                "valueBefore": "",
+                "valueAfter": "so much",
+                "type": "updated"
               }
             ],
-            "operator": "n"
+            "type": "nested"
           },
           {
             "key": "key",
             "value": "value",
-            "operator": " "
+            "type": "unchanged"
           },
           {
             "key": "ops",
             "value": "vops",
-            "operator": "+"
+            "type": "added"
           }
         ],
-        "operator": "n"
+        "type": "nested"
       }
     ],
-    "operator": "n"
+    "type": "nested"
   },
   {
     "key": "group1",
     "value": [
       {
         "key": "baz",
-        "prevValue": "bas",
-        "value": "bars",
-        "operator": "u"
+        "valueBefore": "bas",
+        "valueAfter": "bars",
+        "type": "updated"
       },
       {
         "key": "foo",
         "value": "bar",
-        "operator": " "
+        "type": "unchanged"
       },
       {
         "key": "nest",
-        "prevValue": {
+        "valueBefore": {
           "key": "value"
         },
-        "value": "str",
-        "operator": "u"
+        "valueAfter": "str",
+        "type": "updated"
       }
     ],
-    "operator": "n"
+    "type": "nested"
   },
   {
     "key": "group2",
@@ -99,7 +99,7 @@
         "id": 45
       }
     },
-    "operator": "-"
+    "type": "removed"
   },
   {
     "key": "group3",
@@ -111,6 +111,6 @@
         }
       }
     },
-    "operator": "+"
+    "type": "added"
   }
 ]

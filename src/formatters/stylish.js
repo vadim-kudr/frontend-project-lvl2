@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import { types } from '../constants.js';
+import types from '../types.js';
 
-const operatorsMap = {
+const signsMap = {
   [types.added]: '+',
   [types.removed]: '-',
   [types.updated]: ' ',
@@ -9,31 +9,25 @@ const operatorsMap = {
   [types.nested]: ' ',
 };
 
-function getPrefix(operator, level) {
-  const prefix = '    '.repeat(level - 1);
-  const sign = operatorsMap[operator];
-  return `${prefix}  ${sign} `;
-}
+const getPrefix = (level) => '    '.repeat(level);
 
-function getRow(key, operator, value, level) {
-  const prefix = getPrefix(operator, level);
-  return `${prefix}${key}: ${value}`;
-}
+const getRow = (key, type, value, level) => {
+  const signPartLevelOffset = 1;
+  const prefix = getPrefix(level - signPartLevelOffset);
+  const sign = signsMap[type];
+  return `${prefix}  ${sign} ${key}: ${value}`;
+};
 
-function formatNestedValue(values, level) {
-  const prefix = '    '.repeat(level);
-  const blockRows = [
-    '{',
-    ...values,
-    `${prefix}}`,
-  ];
+const formatNestedValue = (values, level) => {
+  const prefix = getPrefix(level);
+  const blockRows = ['{', ...values, `${prefix}}`];
   return blockRows.join('\n');
-}
+};
 
-function formatValue(key, operator, value, level) {
+const formatValue = (key, type, value, level) => {
   if (_.isArray(value)) {
     const formattedValue = formatNestedValue(value, level);
-    return getRow(key, operator, formattedValue, level);
+    return getRow(key, type, formattedValue, level);
   }
 
   if (_.isPlainObject(value)) {
@@ -41,38 +35,37 @@ function formatValue(key, operator, value, level) {
       .keys(value)
       .map((childKey) => formatValue(childKey, types.unchanged, value[childKey], level + 1));
     const formattedValue = formatNestedValue(rows, level);
-    return getRow(key, operator, formattedValue, level);
+    return getRow(key, type, formattedValue, level);
   }
 
-  return getRow(key, operator, value, level);
-}
+  return getRow(key, type, value, level);
+};
 
-function formatDiff(diff, level) {
+const formatDiff = (diff, level) => {
   const {
-    key, operator, value, prevValue,
+    key, type, value, valueBefore, valueAfter,
   } = diff;
 
-  switch (operator) {
+  switch (type) {
     case types.added:
     case types.removed:
     case types.unchanged: {
-      return formatValue(key, operator, value, level);
+      return formatValue(key, type, value, level);
     }
     case types.updated:
       return [
-        formatDiff({ key, operator: types.removed, value: prevValue }, level),
-        formatDiff({ key, operator: types.added, value }, level),
+        formatDiff({ key, type: types.removed, value: valueBefore }, level),
+        formatDiff({ key, type: types.added, value: valueAfter }, level),
       ].join('\n');
     case types.nested: {
-      const diffs = Object.values(value)
-        .map((childDiff) => formatDiff(childDiff, level + 1));
+      const diffs = Object.values(value).map((childDiff) => formatDiff(childDiff, level + 1));
 
-      return formatValue(key, operator, diffs, level);
+      return formatValue(key, type, diffs, level);
     }
     default:
-      throw new Error(`non supported operator ${operator}`);
+      throw new Error(`non supported node type ${type}`);
   }
-}
+};
 
 export default function stylishFormatter(diffs) {
   const rows = diffs.map((diff) => formatDiff(diff, 1));
