@@ -11,7 +11,7 @@ export default function compareTrees(nodeA, nodeB) {
     const valueA = _.get(nodeA, key);
     const valueB = _.get(nodeB, key);
 
-    if (_.has(nodeA, key) && !_.has(nodeB, key)) {
+    if (!_.has(nodeB, key)) {
       return {
         key,
         value: valueA,
@@ -19,7 +19,7 @@ export default function compareTrees(nodeA, nodeB) {
       };
     }
 
-    if (!_.has(nodeA, key) && _.has(nodeB, key)) {
+    if (!_.has(nodeA, key)) {
       return {
         key,
         value: valueB,
@@ -30,7 +30,7 @@ export default function compareTrees(nodeA, nodeB) {
     if (_.isPlainObject(valueA) && _.isPlainObject(valueB)) {
       return {
         key,
-        value: compareTrees(valueA, valueB),
+        children: compareTrees(valueA, valueB),
         type: types.nested,
       };
     }

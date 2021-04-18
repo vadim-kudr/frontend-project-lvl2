@@ -1,7 +1,9 @@
 import _ from 'lodash';
 import types from '../types.js';
 
-const formatDiffValue = (value) => {
+const makeKeyPath = (path, key) => (path ? `${path}.${key}` : key);
+
+const stringify = (value) => {
   if (_.isObject(value) || _.isArray(value)) {
     return '[complex value]';
   }
@@ -11,67 +13,35 @@ const formatDiffValue = (value) => {
   return value;
 };
 
-const makeDiffDesc = (diff) => {
+const formatDiff = (diff, path = '') => {
   const {
-    type, value, valueBefore, valueAfter,
+    key, type, children, value, valueBefore, valueAfter,
   } = diff;
+
+  const keyPath = makeKeyPath(path, key);
 
   switch (type) {
     case types.added:
-      return `added with value: ${formatDiffValue(value)}`;
+      return `Property '${keyPath}' was added with value: ${stringify(value)}`;
     case types.removed:
-      return 'removed';
+      return `Property '${keyPath}' was removed`;
     case types.updated: {
-      const before = formatDiffValue(valueBefore);
-      const after = formatDiffValue(valueAfter);
-      return `updated. From ${before} to ${after}`;
+      const before = stringify(valueBefore);
+      const after = stringify(valueAfter);
+      return `Property '${keyPath}' was updated. From ${before} to ${after}`;
     }
-    case types.unchanged:
     case types.nested:
+      return children.flatMap(diff => formatDiff(diff, keyPath));
+    case types.unchanged:
       return null;
     default:
       throw new Error(`non supported node type ${type}`);
   }
 };
 
-const formatDiff = (diff) => {
-  const { key } = diff;
-
-  const desc = makeDiffDesc(diff);
-  if (!desc) {
-    return null;
-  }
-  return `Property '${key}' was ${desc}`;
-};
-
-const getKeyPath = (path, key) => (path ? `${path}.${key}` : key);
-
-export function flatDiffs(diffs, path = '') {
-  return diffs.reduce((acc, diff) => {
-    const { key, value } = diff;
-
-    const keyPath = getKeyPath(path, key);
-
-    if (_.isArray(value)) {
-      const subTree = flatDiffs(value, keyPath);
-      return acc.concat(subTree);
-    }
-
-    return [
-      ...acc,
-      {
-        ...diff,
-        key: keyPath,
-      },
-    ];
-  }, []);
-}
-
 export default function plainFormatter(diffs) {
-  const preparedDiffs = flatDiffs(diffs);
-
-  return preparedDiffs
-    .reduce((acc, diff) => acc.concat(formatDiff(diff)), [])
+  return diffs
+    .flatMap((diff) => formatDiff(diff))
     .filter(Boolean)
     .join('\n');
 }

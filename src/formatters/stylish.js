@@ -9,48 +9,41 @@ const signsMap = {
   [types.nested]: ' ',
 };
 
-const getPrefix = (level) => '    '.repeat(level);
+const makePrefix = (level) => '    '.repeat(level);
 
-const getRow = (key, type, value, level) => {
+const makeRow = (key, type, value, level) => {  
   const signPartLevelOffset = 1;
-  const prefix = getPrefix(level - signPartLevelOffset);
-  const sign = signsMap[type];
-  return `${prefix}  ${sign} ${key}: ${value}`;
+  const prefix = makePrefix(level - signPartLevelOffset);
+  return `${prefix}  ${signsMap[type]} ${key}: ${value}`;
 };
 
-const formatNestedValues = (values, level) => {
-  const prefix = getPrefix(level);
-  const blockRows = ['{', ...values, `${prefix}}`];
-  return blockRows.join('\n');
+const wrapNestedRows = (rows, level) => {
+  const prefix = makePrefix(level);
+  return ['{', ...rows, `${prefix}}`].join('\n');
 };
 
-const formatValue = (key, type, value, level) => {
-  if (_.isArray(value)) {
-    const formattedValue = formatNestedValues(value, level);
-    return getRow(key, type, formattedValue, level);
-  }
-
+const stringify = (key, type, value, level) => {
   if (_.isPlainObject(value)) {
     const rows = Object
-      .keys(value)
-      .map((childKey) => formatValue(childKey, types.unchanged, value[childKey], level + 1));
-    const formattedValue = formatNestedValues(rows, level);
-    return getRow(key, type, formattedValue, level);
+      .entries(value)
+      .map(([childKey, childValue]) => stringify(childKey, types.unchanged, childValue, level + 1));
+    const nestedRows = wrapNestedRows(rows, level);
+    return makeRow(key, type, nestedRows, level);
   }
 
-  return getRow(key, type, value, level);
+  return makeRow(key, type, value, level);
 };
 
 const formatDiff = (diff, level) => {
   const {
-    key, type, value, valueBefore, valueAfter,
+    key, type, children, value, valueBefore, valueAfter,
   } = diff;
 
   switch (type) {
     case types.added:
     case types.removed:
     case types.unchanged: {
-      return formatValue(key, type, value, level);
+      return stringify(key, type, value, level);
     }
     case types.updated:
       return [
@@ -58,9 +51,9 @@ const formatDiff = (diff, level) => {
         formatDiff({ key, type: types.added, value: valueAfter }, level),
       ].join('\n');
     case types.nested: {
-      const diffs = Object.values(value).map((childDiff) => formatDiff(childDiff, level + 1));
-
-      return formatValue(key, type, diffs, level);
+      const diffs = Object.values(children).map((childDiff) => formatDiff(childDiff, level + 1));
+      const nestedRows = wrapNestedRows(diffs, level);
+      return stringify(key, type, nestedRows, level);
     }
     default:
       throw new Error(`non supported node type ${type}`);
@@ -69,5 +62,5 @@ const formatDiff = (diff, level) => {
 
 export default function stylishFormatter(diffs) {
   const rows = diffs.map((diff) => formatDiff(diff, 1));
-  return formatNestedValues(rows, 0);
+  return wrapNestedRows(rows, 0);
 }
