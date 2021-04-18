@@ -31,7 +31,7 @@ const formatDiff = (diff, path = '') => {
       return `Property '${keyPath}' was updated. From ${before} to ${after}`;
     }
     case types.nested:
-      return children.flatMap(diff => formatDiff(diff, keyPath));
+      return children.flatMap((childDiff) => formatDiff(childDiff, keyPath));
     case types.unchanged:
       return null;
     default:

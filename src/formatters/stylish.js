@@ -11,7 +11,7 @@ const signsMap = {
 
 const makePrefix = (level) => '    '.repeat(level);
 
-const makeRow = (key, type, value, level) => {  
+const makeRow = (key, type, value, level) => {
   const signPartLevelOffset = 1;
   const prefix = makePrefix(level - signPartLevelOffset);
   return `${prefix}  ${signsMap[type]} ${key}: ${value}`;
